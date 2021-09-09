@@ -1,0 +1,14 @@
+export const ITEM1 = require("./item1.png");
+export const ITEM2 = require("./item2.png");
+export const ITEM3 = require("./item3.png");
+export const ITEM4 = require("./item4.png");
+export const AVATAR = require("./avatar.png");
+export const AVATAR2 = require("./avatar2.png");
+export const BG1 = require("./bg1.jpg");
+export const BG2 = require("./bg2.jpg");
+export const BG3 = require("./bg3.jpg");
+export const BG4 = require("./bg4.jpg");
+export const BG5 = require("./bg5.jpg");
+export const BG6 = require("./bg6.jpg");
+export const Loading = require("./loading.gif");
+export const calories = require("./calories.png");

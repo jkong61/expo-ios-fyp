@@ -1,0 +1,78 @@
+name: CI Test and Build
+
+on:
+  push:
+    branches: [ master ]
+
+env:
+  EXPO_VERSION: 41.0.0
+  NODE_VERSION: 14.x
+  EXPO_USERNAME: ${{ secrets.EXPO_USER }}
+  EXPO_PASSWORD: ${{ secrets.EXPO_PASSWORD }}
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    name: Run Unit Test
+    steps:
+    - uses: actions/checkout@v2
+    - uses: actions/setup-node@v1
+      with:
+        node-version: ${{ env.NODE_VERSION }}
+    - name: Run Tests
+      run: |
+        npm ci
+        npx jest --ci
+  publish:
+    needs: test
+    name: Publish
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v1
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+      - uses: expo/expo-github-action@v5
+        with:
+          expo-version: latest
+          expo-username: ${{ secrets.EXPO_USER }}
+          expo-password: ${{ secrets.EXPO_PASSWORD }}
+          expo-cache: true
+      - name: Publish Application
+        run: |
+          npm ci
+          expo publish
+  build:
+    needs: [test, publish]
+    name: Build Android Package
+    runs-on: ubuntu-latest
+    env:
+      EXPO_ANDROID_KEY_PASSWORD: ${{ secrets.EXPO_ANDROID_KEY_PASSWORD }}
+      EXPO_ANDROID_KEYSTORE_PASSWORD: ${{ secrets.EXPO_ANDROID_KEYSTORE_PASSWORD }}
+    steps:
+      - name: Setup Project Artifact
+        run: |
+          echo "ARTIFACT_NAME=project2-${GITHUB_SHA}-`date +%d%m%y-%H%M`.aab" >> $GITHUB_ENV
+      - uses: actions/checkout@v2
+      - name: Set Up Node ${{ env.NODE_VERSION }}
+        uses: actions/setup-node@v1
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+      - name: Set Up Java 8
+        uses: actions/setup-java@v1
+        with:
+          java-version: '8'
+      - name: Build Package
+        run: |
+          npm ci
+          npm -g install turtle-cli
+          gpg -q --batch --yes -d --passphrase='${{ secrets.GPG_PASSPHRASE }}' -o ./expo-project.jks project2.jks.gpg
+          turtle setup:android --sdk-version ${{ env.EXPO_VERSION }}
+          turtle build:android --keystore-path ./expo-project.jks --type app-bundle --keystore-alias ${{ secrets.ANDROID_KEYSTORE_ALIAS }} -o ./${ARTIFACT_NAME}
+      - name: Archive .apk build
+        if: ${{success()}}
+        uses: actions/upload-artifact@v2
+        with:
+          name: ${{env.ARTIFACT_NAME}}
+          path: ./${{env.ARTIFACT_NAME}}
+          retention-days: 14

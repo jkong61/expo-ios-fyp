@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "415663939280",
+    "project_id": "healthonline-295912",
+    "storage_bucket": "healthonline-295912.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:415663939280:android:fd9a7bfee592c5424708d5",
+        "android_client_info": {
+          "package_name": "com.yungts97.project2"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCkjNK_XzvUzSwbrRcmX2gbLD_ScJaryng"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
